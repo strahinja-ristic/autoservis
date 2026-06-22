@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoServis — Paketi i cenovnik</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f8fafd;
+    color: #0a1628;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    background: white;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.08);
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #0a1628 0%, #0d2248 60%, #0057b7 100%);
+    padding: 52px 60px 48px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; right: -40px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+
+  .header-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.85);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 22px;
+  }
+
+  .header h1 {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 10px;
+    line-height: 1.1;
+  }
+
+  .header h1 span { color: #60a5fa; }
+
+  .header .tagline {
+    font-size: 17px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.72);
+    max-width: 500px;
+    margin-bottom: 32px;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+
+  .header-text { flex: 1; }
+
+  .header-logo img {
+    width: 130px;
+    height: 130px;
+    object-fit: contain;
+    opacity: 0.92;
+    filter: drop-shadow(0 4px 16px rgba(0,0,0,0.3));
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 36px;
+    margin-top: 10px;
+  }
+
+  .stat { display: flex; flex-direction: column; }
+  .stat-num { font-size: 26px; font-weight: 700; color: #60a5fa; }
+  .stat-lbl { font-size: 11px; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.8px; }
+
+  /* SECTIONS */
+  .section { padding: 52px 60px; }
+  .section-alt { background: #f8fafd; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #0057b7;
+    margin-bottom: 10px;
+  }
+
+  .section h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0a1628;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+
+  .section p {
+    color: #4a6080;
+    font-size: 15px;
+    line-height: 1.75;
+    max-width: 680px;
+  }
+
+  /* FOR WHOM */
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 18px;
+    margin-top: 32px;
+  }
+
+  .card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px 20px;
+  }
+
+  .card-icon {
+    font-size: 26px;
+    margin-bottom: 12px;
+  }
+
+  .card h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0a1628;
+    margin-bottom: 6px;
+  }
+
+  .card p {
+    font-size: 13px;
+    color: #7a90aa;
+    line-height: 1.5;
+  }
+
+  /* PACKAGES */
+  .packages {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 22px;
+    margin-top: 36px;
+  }
+
+  .package {
+    border-radius: 14px;
+    border: 1.5px solid #e2e8f0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .package.featured {
+    border-color: #0057b7;
+    box-shadow: 0 0 0 3px rgba(0,87,183,0.1);
+  }
+
+  .package.premium {
+    border-color: #d0d9e6;
+    opacity: 0.82;
+  }
+
+  .pkg-header {
+    padding: 24px 22px 20px;
+    background: #f8fafd;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .package.featured .pkg-header {
+    background: linear-gradient(135deg, #0057b7, #0041a8);
+    border-bottom-color: transparent;
+  }
+
+  .package.premium .pkg-header {
+    background: linear-gradient(135deg, #1e293b, #334155);
+  }
+
+  .pkg-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    background: rgba(0,87,183,0.1);
+    color: #0057b7;
+  }
+
+  .package.featured .pkg-badge {
+    background: rgba(255,255,255,0.18);
+    color: white;
+  }
+
+  .package.premium .pkg-badge {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.7);
+  }
+
+  .pkg-name {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0a1628;
+    margin-bottom: 4px;
+  }
+
+  .package.featured .pkg-name,
+  .package.premium .pkg-name { color: white; }
+
+  .pkg-sub {
+    font-size: 12px;
+    color: #7a90aa;
+    font-weight: 400;
+  }
+
+  .package.featured .pkg-sub { color: rgba(255,255,255,0.65); }
+  .package.premium .pkg-sub { color: rgba(255,255,255,0.5); }
+
+  .best-value {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: #fbbf24;
+    color: #78350f;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 8px;
+  }
+
+  .dev-badge {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.8);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .pkg-features {
+    padding: 20px 22px 24px;
+    list-style: none;
+  }
+
+  .pkg-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 7px 0;
+    font-size: 13px;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .pkg-features li:last-child { border-bottom: none; }
+
+  .check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 17px;
+    height: 17px;
+    min-width: 17px;
+    border-radius: 50%;
+    background: #dcfce7;
+    color: #16a34a;
+    font-size: 9px;
+    font-weight: 900;
+    margin-top: 1px;
+  }
+
+  .package.featured .pkg-features li { color: #0a1628; }
+
+  /* COMPARISON TABLE */
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 28px;
+    font-size: 13px;
+  }
+
+  .comp-table th {
+    background: #0a1628;
+    color: white;
+    padding: 14px 18px;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .comp-table th:first-child { border-radius: 10px 0 0 0; }
+  .comp-table th:last-child { border-radius: 0 10px 0 0; text-align: center; }
+  .comp-table th:not(:first-child) { text-align: center; }
+
+  .comp-table tr:nth-child(even) td { background: #f8fafd; }
+
+  .comp-table td {
+    padding: 12px 18px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #334155;
+  }
+
+  .comp-table td:not(:first-child) { text-align: center; }
+
+  .comp-table .section-row td {
+    background: #0057b7 !important;
+    color: white;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 18px;
+  }
+
+  .yes { color: #16a34a; font-size: 16px; font-weight: 700; }
+  .no { color: #d1d5db; font-size: 16px; }
+  .soon { color: #f59e0b; font-size: 11px; font-weight: 700; }
+
+  /* FOOTER */
+  .footer {
+    background: #0a1628;
+    color: rgba(255,255,255,0.55);
+    text-align: center;
+    padding: 32px 60px;
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  .footer strong { color: rgba(255,255,255,0.85); }
+
+  /* HIGHLIGHT BOX */
+  .highlight {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-top: 32px;
+  }
+
+  .highlight h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e40af;
+    margin-bottom: 8px;
+  }
+
+  .highlight p {
+    font-size: 13px;
+    color: #1e40af;
+    opacity: 0.85;
+  }
+
+  .divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 0 60px;
+  }
+
+  @media print {
+    @page { size: A4 portrait; margin: 12mm 14mm; }
+
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+    body { background: white; font-size: 11px; }
+
+    .page { max-width: none; width: 100%; margin: 0; box-shadow: none; }
+
+    /* Header */
+    .header { padding: 26px 32px 22px; }
+    .header-logo img { width: 90px; height: 90px; }
+    .header h1 { font-size: 28px; margin-bottom: 6px; }
+    .header .tagline { font-size: 12px; margin-bottom: 18px; }
+    .header-stats { gap: 28px; }
+    .stat-num { font-size: 18px; }
+    .stat-lbl { font-size: 10px; }
+
+    /* Sections */
+    .section { padding: 22px 32px; }
+    .section h2 { font-size: 16px; margin-bottom: 10px; }
+    .section p { font-size: 11px; line-height: 1.6; }
+    .divider { margin: 0 32px; }
+
+    /* Cards */
+    .cards { gap: 10px; margin-top: 16px; }
+    .card { padding: 14px 12px; }
+    .card-icon { font-size: 18px; margin-bottom: 6px; }
+    .card h4 { font-size: 11px; }
+    .card p { font-size: 10px; }
+
+    /* Packages */
+    .packages { gap: 12px; margin-top: 18px; }
+    .pkg-header { padding: 14px 14px 12px; }
+    .pkg-name { font-size: 15px; }
+    .pkg-sub { font-size: 10px; }
+    .pkg-badge { font-size: 9px; margin-bottom: 6px; }
+    .pkg-features { padding: 12px 14px 14px; }
+    .pkg-features li { padding: 4px 0; font-size: 10px; gap: 7px; }
+    .check { width: 14px; height: 14px; min-width: 14px; font-size: 8px; }
+    .best-value { font-size: 8px; padding: 2px 7px; }
+    .dev-badge { font-size: 8px; padding: 2px 7px; }
+
+    /* Table */
+    .comp-table { margin-top: 18px; font-size: 10px; }
+    .comp-table th { padding: 9px 12px; }
+    .comp-table td { padding: 7px 12px; }
+    .comp-table .section-row td { padding: 6px 12px; font-size: 9px; }
+    .yes { font-size: 13px; }
+    .no { font-size: 13px; }
+
+    /* Highlight */
+    .highlight { padding: 14px 18px; margin-top: 18px; }
+    .highlight h4 { font-size: 12px; margin-bottom: 5px; }
+    .highlight p { font-size: 11px; }
+
+    /* Footer */
+    .footer { padding: 18px 32px; font-size: 10px; }
+
+    /* Sekcija koja mora početi na novoj strani */
+    .section-nova-strana { page-break-before: always; break-before: page; }
+
+    /* Sprečava prelamanje elemenata */
+    .header         { page-break-inside: avoid; }
+    .cards          { page-break-inside: avoid; }
+    .packages       { page-break-inside: avoid; }
+    .package        { page-break-inside: avoid; }
+    .comp-table     { page-break-inside: avoid; }
+    .highlight      { page-break-inside: avoid; }
+    .footer         { page-break-inside: avoid; }
+    .section-alt    { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-inner">
+      <div class="header-text">
+        <div class="header-badge">Desktop aplikacija za auto servise</div>
+        <h1>Auto<span>Servis</span></h1>
+        <p class="tagline">Kompletno rešenje za upravljanje auto servisom — od prijema vozila do izdavanja priloga uz račun, sve na jednom mestu.</p>
+        <div class="header-stats">
+          <div class="stat">
+            <span class="stat-num">2</span>
+            <span class="stat-lbl">Paketa</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">Desktop</span>
+            <span class="stat-lbl">Minimalan internet</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">PDF</span>
+            <span class="stat-lbl">Generisanje dokumenata</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-logo">
+        <img src="src/main/resources/maintenance.png" alt="AutoServis logo">
+      </div>
+    </div>
+  </div>
+
+  <!-- O APLIKACIJI -->
+  <div class="section">
+    <div class="section-label">O aplikaciji</div>
+    <h2>Sve što vam treba za vođenje servisa</h2>
+    <p>
+      AutoServis je desktop aplikacija dizajnirana specifično za auto servise koji žele da organizuju
+      svakodnevno poslovanje — bez papira, bez grešaka i bez gubljenja vremena. Aplikacija radi direktno
+      na vašem računaru i čuva sve podatke lokalno. Povremena internet veza je potrebna isključivo za
+      verifikaciju licence — jednom svakih 5 dana, trajanja svega nekoliko sekundi.
+    </p>
+    <p style="margin-top: 14px;">
+      Od prvog kontakta sa klijentom, prijema vozila, izrade radnog naloga i predračuna, do kreiranja
+      priloga uz račun i praćenja magacina — sve je integrisano u jedan alat koji prati tok rada u servisu.
+    </p>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🔧</div>
+        <h4>Mali i srednji servisi</h4>
+        <p>Idealno za servise koji žele da digitalizuju poslovanje bez skupih ERP sistema.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📋</div>
+        <h4>Precizna dokumentacija</h4>
+        <p>Svaki nalog, predračun i prilog uz račun su uredni, profesionalni i uvek dostupni.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚗</div>
+        <h4>Istorija po vozilu</h4>
+        <p>Svi radovi i servisi obavljeni kod vas za svako vozilo, dostupni u jednom kliku.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- PAKETI -->
+  <div class="section section-alt">
+    <div class="section-label">Paketi</div>
+    <h2>Izaberite paket koji odgovara vašem servisu</h2>
+    <p>Oba paketa uključuju sve što je neophodno za svakodnevni rad. Razlika je u dodatnim alatima za automatizaciju i analitiku.</p>
+
+    <div class="packages">
+
+      <!-- OSNOVNO -->
+      <div class="package">
+        <div class="pkg-header">
+          <div class="pkg-badge">Osnovno</div>
+          <div class="pkg-name">Osnovno</div>
+          <div class="pkg-sub">Za svakodnevni rad servisa</div>
+        </div>
+        <ul class="pkg-features">
+          <li><span class="check">✓</span> Upravljanje klijentima</li>
+          <li><span class="check">✓</span> Evidencija vozila</li>
+          <li><span class="check">✓</span> Radni nalozi</li>
+          <li><span class="check">✓</span> Predračuni</li>
+          <li><span class="check">✓</span> Prilog uz račun</li>
+          <li><span class="check">✓</span> Magacin i artikli</li>
+          <li><span class="check">✓</span> Nivelacija cena</li>
+          <li><span class="check">✓</span> Šabloni usluga</li>
+          <li><span class="check">✓</span> Generisanje PDF dokumenata</li>
+          <li><span class="check">✓</span> Istorija radova po vozilu (vaš servis)</li>
+        </ul>
+      </div>
+
+      <!-- POSLOVNI -->
+      <div class="package featured">
+        <div class="pkg-header">
+          <div class="pkg-badge">Preporučeno</div>
+          <div class="pkg-name">Poslovni</div>
+          <div class="pkg-sub">Sve iz osnovnog + automatizacija</div>
+        </div>
+        <div class="best-value">Najpopularniji</div>
+        <ul class="pkg-features">
+          <li><span class="check">✓</span> Sve iz Osnovnog paketa</li>
+          <li><span class="check">✓</span> Slanje dokumenata emailom</li>
+          <li><span class="check">✓</span> Popis magacina</li>
+          <li><span class="check">✓</span> Osnovne statistike poslovanja</li>
+          <li><span class="check">✓</span> Automatski backup na eksterni drajv</li>
+        </ul>
+      </div>
+
+      <!-- PREMIUM -->
+      <div class="package premium">
+        <div class="pkg-header">
+          <div class="pkg-badge">Premium</div>
+          <div class="pkg-name">Premium</div>
+          <div class="pkg-sub">Za napredne korisnike</div>
+        </div>
+        <div class="dev-badge">U razvoju</div>
+        <ul class="pkg-features">
+          <li><span class="check">✓</span> Sve iz Poslovnog paketa</li>
+          <li><span class="check">✓</span> Finansijske statistike i izveštaji</li>
+          <li><span class="check">✓</span> Automatski export za računovođu</li>
+          <li><span class="check">✓</span> Napredna analitika prihoda</li>
+          <li><span class="check">✓</span> Prioritetna podrška</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="highlight">
+      <h4>Premium paket je u pripremi</h4>
+      <p>
+        Korisnici koji unapred izraze interesovanje za Premium paket biće prvi obavešteni o dostupnosti
+        i imaće pravo na posebne uslove. Kontaktirajte nas za više informacija.
+      </p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TABELA POREĐENJA -->
+  <div class="section section-nova-strana">
+    <div class="section-label">Poređenje</div>
+    <h2>Pregled funkcionalnosti po paketima</h2>
+
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Funkcionalnost</th>
+          <th>Osnovno</th>
+          <th>Poslovni</th>
+          <th>Premium</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr class="section-row"><td colspan="4">Osnovno upravljanje</td></tr>
+        <tr><td>Klijenti i vozila</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Radni nalozi</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Predračuni</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Prilog uz račun</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Istorija radova po vozilu (vaš servis)</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+
+        <tr class="section-row"><td colspan="4">Magacin i cene</td></tr>
+        <tr><td>Magacin i artikli</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Nivelacija cena</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Šabloni usluga</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Popis magacina</td><td><span class="no">—</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+
+        <tr class="section-row"><td colspan="4">Dokumenta i komunikacija</td></tr>
+        <tr><td>Generisanje PDF dokumenata</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Slanje emailom</td><td><span class="no">—</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Export za računovođu</td><td><span class="no">—</span></td><td><span class="no">—</span></td><td><span class="soon">Uskoro</span></td></tr>
+
+        <tr class="section-row"><td colspan="4">Statistike i analitika</td></tr>
+        <tr><td>Osnovne statistike</td><td><span class="no">—</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Finansijske statistike</td><td><span class="no">—</span></td><td><span class="no">—</span></td><td><span class="soon">Uskoro</span></td></tr>
+
+        <tr class="section-row"><td colspan="4">Sigurnost i backup</td></tr>
+        <tr><td>Lokalni backup podataka</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Automatski backup na eksterni drajv</td><td><span class="no">—</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p><strong>AutoServis</strong> — Desktop aplikacija za auto servise</p>
+    <p style="margin-top: 6px;">Za informacije o cenama i kupovini licence obratite se direktno.</p>
+    <p style="margin-top: 4px; font-size: 11px; opacity: 0.5;">Dokument je informativnog karaktera. Funkcionalnosti i paketi podložni su izmeni.</p>
+  </div>
+
+</div>
+</body>
+</html>
