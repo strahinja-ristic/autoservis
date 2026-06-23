@@ -35,20 +35,19 @@ public class ArtikalDao {
     // Izmeni postojeci artikal
     public void izmeni(Artikal artikal) throws SQLException {
         String sql = """
-                UPDATE artikli SET naziv=?, sifra=?, jedinica_mere=?, nabavna_cena=?, prodajna_cena=?, minimalna_kolicina=?, vrsta=?
+                UPDATE artikli SET naziv=?, sifra=?, jedinica_mere=?, kolicina=?, nabavna_cena=?, prodajna_cena=?, minimalna_kolicina=?, vrsta=?
                 WHERE id=?
                 """;
         try (PreparedStatement stmt = DatabaseManager.getConnection().prepareStatement(sql)) {
             stmt.setString(1, artikal.getNaziv());
             if (artikal.getSifra() != null) stmt.setInt(2, artikal.getSifra()); else stmt.setNull(2, Types.INTEGER);
             stmt.setString(3, artikal.getJedinicaMere());
-            if (artikal.getNabavnaCena() != null) stmt.setDouble(4, artikal.getNabavnaCena());
-            else stmt.setNull(4, Types.REAL);
-            stmt.setDouble(5, artikal.getProdajnaCena());
-            if (artikal.getMinimalnaKolicina() != null) stmt.setDouble(6, artikal.getMinimalnaKolicina());
-            else stmt.setNull(6, Types.REAL);
-            stmt.setString(7, artikal.getVrsta());
-            stmt.setInt(8, artikal.getId());
+            if (artikal.getKolicina() != null) stmt.setDouble(4, artikal.getKolicina()); else stmt.setNull(4, Types.REAL);
+            if (artikal.getNabavnaCena() != null) stmt.setDouble(5, artikal.getNabavnaCena()); else stmt.setNull(5, Types.REAL);
+            stmt.setDouble(6, artikal.getProdajnaCena());
+            if (artikal.getMinimalnaKolicina() != null) stmt.setDouble(7, artikal.getMinimalnaKolicina()); else stmt.setNull(7, Types.REAL);
+            stmt.setString(8, artikal.getVrsta());
+            stmt.setInt(9, artikal.getId());
             stmt.executeUpdate();
         }
     }
@@ -105,6 +104,16 @@ public class ArtikalDao {
         String sql = "SELECT COUNT(*) FROM artikli WHERE sifra=?";
         try (PreparedStatement stmt = DatabaseManager.getConnection().prepareStatement(sql)) {
             stmt.setInt(1, sifra);
+            try (ResultSet rs = stmt.executeQuery()) { return rs.next() && rs.getInt(1) > 0; }
+        }
+    }
+
+    public boolean postojiSifraZaDrugi(Integer sifra, int excludeId) throws SQLException {
+        if (sifra == null) return false;
+        String sql = "SELECT COUNT(*) FROM artikli WHERE sifra=? AND id != ?";
+        try (PreparedStatement stmt = DatabaseManager.getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, sifra);
+            stmt.setInt(2, excludeId);
             try (ResultSet rs = stmt.executeQuery()) { return rs.next() && rs.getInt(1) > 0; }
         }
     }

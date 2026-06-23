@@ -161,21 +161,21 @@ public class KlijentFormaController {
     private void popuniFormu() {
         if ("Pravno".equals(klijent.getTip())) {
             rbPravno.setSelected(true);
-            tfNazivFirme.setText(klijent.getNazivFirme());
-            tfPib.setText(klijent.getPib());
-            tfMaticniBroj.setText(klijent.getMaticniBroj());
-
+            tfNazivFirme.setText(s(klijent.getNazivFirme()));
+            tfPib.setText(s(klijent.getPib()));
+            tfMaticniBroj.setText(s(klijent.getMaticniBroj()));
         } else {
             rbFizicko.setSelected(true);
-            tfIme.setText(klijent.getIme());
-            tfPrezime.setText(klijent.getPrezime());
+            tfIme.setText(s(klijent.getIme()));
+            tfPrezime.setText(s(klijent.getPrezime()));
         }
-        tfAdresa.setText(klijent.getAdresa() != null ? klijent.getAdresa() : "");
-        tfTelefon.setText(klijent.getTelefon() != null ? klijent.getTelefon() : "");
-        tfEmail.setText(klijent.getEmail() != null ? klijent.getEmail() : "");
-        taNapomena.setText(klijent.getNapomena() != null ? klijent.getNapomena() : "");
-
+        tfAdresa.setText(s(klijent.getAdresa()));
+        tfTelefon.setText(s(klijent.getTelefon()));
+        tfEmail.setText(s(klijent.getEmail()));
+        taNapomena.setText(s(klijent.getNapomena()));
     }
+
+    private static String s(String v) { return v != null ? v : ""; }
 
     private void sacuvaj() {
         if (!validiraj()) return;
@@ -221,8 +221,8 @@ public class KlijentFormaController {
 
     private boolean validiraj() {
         if (rbFizicko.isSelected()) {
-            if (tfIme.getText().isBlank() || tfPrezime.getText().isBlank()) {
-                prikaziGresku("Ime i prezime su obavezni.");
+            if (tfIme.getText().isBlank()) {
+                prikaziGresku("Ime je obavezno.");
                 return false;
             }
         } else {

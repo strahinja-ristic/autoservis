@@ -25,6 +25,9 @@ public class RadniNalog {
     private List<NalogUsluga> usluge = new ArrayList<>();
     private List<NalogArtikal> artikli = new ArrayList<>();
 
+    private String klijentIme = "";
+    private String voziloStr = "";
+
     public RadniNalog() {}
 
     // Getteri i Setteri
@@ -81,6 +84,12 @@ public class RadniNalog {
 
     public List<NalogArtikal> getArtikli() { return artikli; }
     public void setArtikli(List<NalogArtikal> artikli) { this.artikli = artikli; }
+
+    public String getKlijentIme() { return klijentIme; }
+    public void setKlijentIme(String klijentIme) { this.klijentIme = klijentIme != null ? klijentIme : ""; }
+
+    public String getVoziloStr() { return voziloStr; }
+    public void setVoziloStr(String voziloStr) { this.voziloStr = voziloStr != null ? voziloStr : ""; }
 
     @Override
     public String toString() {

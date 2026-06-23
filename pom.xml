@@ -148,6 +148,50 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.github.wvengen</groupId>
+                <artifactId>proguard-maven-plugin</artifactId>
+                <version>2.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>proguard</goal></goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <proguardVersion>7.4.2</proguardVersion>
+                    <injar>${project.build.finalName}.jar</injar>
+                    <outjar>${project.build.finalName}.jar</outjar>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <obfuscate>true</obfuscate>
+                    <addMavenDescriptor>false</addMavenDescriptor>
+                    <options>
+                        <option>@${project.basedir}/proguard.conf</option>
+                    </options>
+                    <libs>
+                        <lib>${java.home}/jmods/java.base.jmod</lib>
+                        <lib>${java.home}/jmods/java.desktop.jmod</lib>
+                        <lib>${java.home}/jmods/java.logging.jmod</lib>
+                        <lib>${java.home}/jmods/java.sql.jmod</lib>
+                        <lib>${java.home}/jmods/java.net.http.jmod</lib>
+                        <lib>${java.home}/jmods/java.xml.jmod</lib>
+                        <lib>${java.home}/jmods/java.naming.jmod</lib>
+                        <lib>${java.home}/jmods/java.security.jgss.jmod</lib>
+                    </libs>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.guardsquare</groupId>
+                        <artifactId>proguard-base</artifactId>
+                        <version>7.4.2</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.guardsquare</groupId>
+                        <artifactId>proguard-core</artifactId>
+                        <version>9.1.4</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
         </plugins>
     </build>
 </project>

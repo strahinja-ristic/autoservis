@@ -209,7 +209,16 @@ public class PredracunDao {
     public List<Predracun> vratiStranicu(String upit, String status, boolean arhiviran, int offset, int limit) throws SQLException {
         List<Object> params = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-            "SELECT p.* FROM predracuni p LEFT JOIN klijenti k ON p.klijent_id=k.id WHERE p.arhiviran=?");
+            "SELECT p.*," +
+            " CASE WHEN k.tip='Pravno' THEN COALESCE(k.naziv_firme,'')" +
+            "      ELSE COALESCE(k.ime,'') || CASE WHEN k.prezime IS NOT NULL AND k.prezime!='' THEN ' '||k.prezime ELSE '' END" +
+            " END AS klijent_ime," +
+            " COALESCE((SELECT SUM(s.kolicina * s.cena_bez_pdv" +
+            "   * (1.0 - COALESCE(s.popust_procenat,0)/100.0)" +
+            "   * (1.0 + COALESCE(s.pdv_stopa,0)/100.0))" +
+            "   FROM predracun_stavke s WHERE s.predracun_id=p.id), 0)" +
+            "   * (1.0 - p.popust_procenat/100.0) AS iznos_za_uplatu" +
+            " FROM predracuni p LEFT JOIN klijenti k ON p.klijent_id=k.id WHERE p.arhiviran=?");
         params.add(arhiviran ? 1 : 0);
         if (upit != null && !upit.isBlank()) {
             String p = "%" + upit + "%";
@@ -226,7 +235,14 @@ public class PredracunDao {
         List<Predracun> lista = new ArrayList<>();
         try (PreparedStatement stmt = DatabaseManager.getConnection().prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) stmt.setObject(i + 1, params.get(i));
-            try (ResultSet rs = stmt.executeQuery()) { while (rs.next()) lista.add(mapiraj(rs)); }
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Predracun p2 = mapiraj(rs);
+                    p2.setKlijentIme(rs.getString("klijent_ime"));
+                    p2.setIznosZaUplatu(rs.getDouble("iznos_za_uplatu"));
+                    lista.add(p2);
+                }
+            }
         }
         return lista;
     }
@@ -286,15 +302,19 @@ public class PredracunDao {
 
     public List<Predracun> vratiKojiIsticuZaDana(int dana) throws SQLException {
         List<Predracun> lista = new ArrayList<>();
-        java.time.LocalDate datum = java.time.LocalDate.now().plusDays(dana);
-        String datumStr = datum.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        java.time.format.DateTimeFormatter iso = java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
+        String danasIso = java.time.LocalDate.now().format(iso);
+        String granicaIso = java.time.LocalDate.now().plusDays(dana).format(iso);
         String sql = """
                 SELECT * FROM predracuni WHERE arhiviran=0
                 AND status NOT IN ('Fakturisan','Odbijen','Istekao')
-                AND datum_vazenja=?
+                AND datum_vazenja IS NOT NULL
+                AND substr(datum_vazenja,7,4)||'-'||substr(datum_vazenja,4,2)||'-'||substr(datum_vazenja,1,2)
+                    BETWEEN ? AND ?
                 """;
         try (PreparedStatement stmt = DatabaseManager.getConnection().prepareStatement(sql)) {
-            stmt.setString(1, datumStr);
+            stmt.setString(1, danasIso);
+            stmt.setString(2, granicaIso);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) lista.add(mapiraj(rs));
             }

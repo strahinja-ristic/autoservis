@@ -197,7 +197,16 @@ public class FakturaDao {
     public List<Faktura> vratiStranicu(String upit, String status, boolean arhiviran, int offset, int limit) throws SQLException {
         List<Object> params = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-            "SELECT f.* FROM fakture f LEFT JOIN klijenti k ON f.klijent_id=k.id WHERE f.arhiviran=?");
+            "SELECT f.*," +
+            " CASE WHEN k.tip='Pravno' THEN COALESCE(k.naziv_firme,'')" +
+            "      ELSE COALESCE(k.ime,'') || CASE WHEN k.prezime IS NOT NULL AND k.prezime!='' THEN ' '||k.prezime ELSE '' END" +
+            " END AS klijent_ime," +
+            " COALESCE((SELECT SUM(s.kolicina * s.cena_bez_pdv" +
+            "   * (1.0 - COALESCE(s.popust_procenat,0)/100.0)" +
+            "   * (1.0 + COALESCE(s.pdv_stopa,0)/100.0))" +
+            "   FROM faktura_stavke s WHERE s.faktura_id=f.id), 0)" +
+            "   * (1.0 - f.popust_procenat/100.0) AS iznos_za_uplatu" +
+            " FROM fakture f LEFT JOIN klijenti k ON f.klijent_id=k.id WHERE f.arhiviran=?");
         params.add(arhiviran ? 1 : 0);
         if (upit != null && !upit.isBlank()) {
             String p = "%" + upit + "%";
@@ -214,7 +223,14 @@ public class FakturaDao {
         List<Faktura> lista = new ArrayList<>();
         try (PreparedStatement stmt = DatabaseManager.getConnection().prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) stmt.setObject(i + 1, params.get(i));
-            try (ResultSet rs = stmt.executeQuery()) { while (rs.next()) lista.add(mapiraj(rs)); }
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Faktura f = mapiraj(rs);
+                    f.setKlijentIme(rs.getString("klijent_ime"));
+                    f.setIznosZaUplatu(rs.getDouble("iznos_za_uplatu"));
+                    lista.add(f);
+                }
+            }
         }
         return lista;
     }

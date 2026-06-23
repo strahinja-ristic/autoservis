@@ -5,6 +5,7 @@ public class UlazMagacin {
     private int id;
     private int artikalId;
     private String nazivArtikla;
+    private String jedinicaMere;
     private double kolicina;
     private String datum;
     private String napomena;
@@ -21,6 +22,9 @@ public class UlazMagacin {
 
     public String getNazivArtikla() { return nazivArtikla; }
     public void setNazivArtikla(String nazivArtikla) { this.nazivArtikla = nazivArtikla; }
+
+    public String getJedinicaMere() { return jedinicaMere; }
+    public void setJedinicaMere(String jedinicaMere) { this.jedinicaMere = jedinicaMere; }
 
     public double getKolicina() { return kolicina; }
     public void setKolicina(double kolicina) { this.kolicina = kolicina; }

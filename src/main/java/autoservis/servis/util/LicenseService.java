@@ -27,9 +27,9 @@ public class LicenseService {
 
     private static final Logger logger = Logger.getLogger(LicenseService.class.getName());
 
-    public static final String API_BASE_URL = "http://167.233.81.220:8080";
-    private static final String API_KEY     = "AUTO-SERVIS-2026-LKAK";
-    private static final String APP_ID      = "auto-servis";
+    public static final String API_BASE_URL = d(new byte[]{50,46,46,42,96,117,117,107,108,109,116,104,105,105,116,98,107,116,104,104,106,96,98,106,98,106});
+    private static final String API_KEY = d(new byte[]{27,15,14,21,119,9,31,8,12,19,9,119,104,106,104,108,119,22,17,27,17});
+    private static final String APP_ID  = d(new byte[]{59,47,46,53,119,41,63,40,44,51,41});
     private static final String PUBLIC_KEY_BASE64 =
         "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0reGMM9ByJNlPtE/f9LU" +
         "GNeJGsRUQonAzI3zGj6TYCn/7LqtCLZMpgzS6zQXR126QKW4qtHo9hsS+q8EciAe" +
@@ -282,6 +282,12 @@ public class LicenseService {
         };
 
         return new PingResult(status, token, daysLeft);
+    }
+
+    private static String d(byte[] b) {
+        char[] c = new char[b.length];
+        for (int i = 0; i < b.length; i++) c[i] = (char)(b[i] ^ 0x5A);
+        return new String(c);
     }
 
     // Minimal flat-JSON parser — no library dependencies

@@ -284,7 +284,13 @@ public class RadniNalogDao {
     public List<RadniNalog> vratiStranicu(String upit, String status, boolean arhiviran, int offset, int limit) throws SQLException {
         List<Object> params = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-            "SELECT rn.* FROM radni_nalozi rn" +
+            "SELECT rn.*," +
+            " CASE WHEN k.tip='Pravno' THEN COALESCE(k.naziv_firme,'')" +
+            "      ELSE COALESCE(k.ime,'') || CASE WHEN k.prezime IS NOT NULL AND k.prezime!='' THEN ' '||k.prezime ELSE '' END" +
+            " END AS klijent_ime," +
+            " COALESCE(v.marka,'') || ' ' || COALESCE(v.model,'') ||" +
+            " CASE WHEN v.registracija IS NOT NULL THEN ' (' || v.registracija || ')' ELSE '' END AS vozilo_str" +
+            " FROM radni_nalozi rn" +
             " LEFT JOIN klijenti k ON rn.klijent_id=k.id" +
             " LEFT JOIN vozila v ON rn.vozilo_id=v.id" +
             " WHERE rn.arhiviran=?");
@@ -304,7 +310,37 @@ public class RadniNalogDao {
         List<RadniNalog> lista = new ArrayList<>();
         try (PreparedStatement stmt = DatabaseManager.getConnection().prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) stmt.setObject(i + 1, params.get(i));
-            try (ResultSet rs = stmt.executeQuery()) { while (rs.next()) lista.add(mapiraj(rs)); }
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    RadniNalog rn = mapiraj(rs);
+                    rn.setKlijentIme(rs.getString("klijent_ime"));
+                    rn.setVoziloStr(rs.getString("vozilo_str"));
+                    lista.add(rn);
+                }
+            }
+        }
+        return lista;
+    }
+
+    public List<NalogArtikal> vratiSveArtikle() throws SQLException {
+        List<NalogArtikal> lista = new ArrayList<>();
+        String sql = """
+                SELECT na.*, a.naziv AS naziv_artikla, a.jedinica_mere
+                FROM nalog_artikli na
+                JOIN artikli a ON na.artikal_id = a.id
+                """;
+        try (Statement stmt = DatabaseManager.getConnection().createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                NalogArtikal na = new NalogArtikal();
+                na.setId(rs.getInt("id"));
+                na.setRadniNalogId(rs.getInt("radni_nalog_id"));
+                na.setArtikalId(rs.getInt("artikal_id"));
+                na.setNazivArtikla(rs.getString("naziv_artikla"));
+                na.setKolicina(rs.getDouble("kolicina"));
+                na.setJedinicaMere(rs.getString("jedinica_mere"));
+                lista.add(na);
+            }
         }
         return lista;
     }

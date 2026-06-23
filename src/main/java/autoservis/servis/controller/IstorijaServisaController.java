@@ -54,7 +54,7 @@ public class IstorijaServisaController {
         topbar.getChildren().addAll(lblNaslov, spacer, lblKm);
 
         if (vozilo.getNapomena() != null && !vozilo.getNapomena().isBlank()) {
-            Label lblUredjaj = new Label("  |  Uređaj: " + vozilo.getNapomena());
+            Label lblUredjaj = new Label("  |  Napomena: " + vozilo.getNapomena());
             lblUredjaj.setStyle("-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 12px;");
             topbar.getChildren().add(lblUredjaj);
         }

@@ -105,12 +105,7 @@ public class PredracunListaController {
         colBroj.setPrefWidth(110);
 
         TableColumn<Predracun, String> colKlijent = new TableColumn<>("Klijent");
-        colKlijent.setCellValueFactory(c -> {
-            try {
-                Klijent k = klijentDao.vratiPoId(c.getValue().getKlijentId());
-                return new SimpleStringProperty(k != null ? k.getPunoIme() : "—");
-            } catch (SQLException e) { return new SimpleStringProperty("—"); }
-        });
+        colKlijent.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getKlijentIme()));
 
         TableColumn<Predracun, String> colDatum = new TableColumn<>("Datum");
         colDatum.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getDatumKreiranja()));
@@ -138,12 +133,7 @@ public class PredracunListaController {
         });
 
         TableColumn<Predracun, String> colIznos = new TableColumn<>("Iznos");
-        colIznos.setCellValueFactory(c -> {
-            try {
-                Predracun p = predracunDao.vratiPoId(c.getValue().getId());
-                return new SimpleStringProperty(p != null ? fmtCena(p.zaUplatu()) : "—");
-            } catch (SQLException e) { return new SimpleStringProperty("—"); }
-        });
+        colIznos.setCellValueFactory(c -> new SimpleStringProperty(fmtCena(c.getValue().getIznosZaUplatu())));
         colIznos.setPrefWidth(110);
 
         TableColumn<Predracun, Void> colAkcije = new TableColumn<>("Akcije");

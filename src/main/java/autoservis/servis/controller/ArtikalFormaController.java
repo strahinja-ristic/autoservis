@@ -131,7 +131,7 @@ public class ArtikalFormaController {
 
     private void popuniFormu() {
         if (artikal.getVrsta() != null) cbVrsta.setValue(artikal.getVrsta());
-        tfNaziv.setText(artikal.getNaziv());
+        tfNaziv.setText(artikal.getNaziv() != null ? artikal.getNaziv() : "");
         if (artikal.getJedinicaMere() != null) cbJedinicaMere.setValue(artikal.getJedinicaMere());
         if (artikal.getSifra() != null) tfSifra.setText(String.valueOf(artikal.getSifra()));
         if (artikal.getKolicina() != null) tfKolicina.setText(String.valueOf(artikal.getKolicina()));
@@ -221,7 +221,10 @@ public class ArtikalFormaController {
         }
         try {
             Integer sifra = Integer.parseInt(tfSifra.getText().trim());
-            if (artikalDao.postojiSifra(sifra)) {
+            boolean zauzeta = artikal == null
+                    ? artikalDao.postojiSifra(sifra)
+                    : artikalDao.postojiSifraZaDrugi(sifra, artikal.getId());
+            if (zauzeta) {
                 prikaziGresku("Šifra " + sifra + " već postoji. Šifra mora biti jedinstvena.");
                 return false;
             }

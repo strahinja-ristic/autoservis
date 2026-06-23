@@ -84,10 +84,16 @@ public class FinansijskiPdfGenerator {
 
     public static void generisiFakturuNaPutanju(Faktura faktura, Klijent klijent, Vozilo vozilo,
                                                   Podesavanja firma, String putanja) throws Exception {
+        generisiFakturuNaPutanju(faktura, klijent, vozilo, firma, java.util.Collections.emptyList(), putanja);
+    }
+
+    public static void generisiFakturuNaPutanju(Faktura faktura, Klijent klijent, Vozilo vozilo,
+                                                  Podesavanja firma, java.util.List<String> usluge,
+                                                  String putanja) throws Exception {
         Document doc = new Document(PageSize.A4, 20, 20, 22, 22);
         PdfWriter.getInstance(doc, new FileOutputStream(putanja));
         doc.open();
-        popuniFakturu(doc, faktura, klijent, vozilo, firma);
+        popuniFakturu(doc, faktura, klijent, vozilo, firma, usluge);
         doc.close();
     }
 
@@ -137,7 +143,7 @@ public class FinansijskiPdfGenerator {
     // ── SADRZAJ FAKTURE ───────────────────────────────────────────
 
     private static void popuniFakturu(Document doc, Faktura f, Klijent k, Vozilo v,
-                                       Podesavanja firma) throws Exception {
+                                       Podesavanja firma, java.util.List<String> usluge) throws Exception {
         dodajHeader(doc, firma, "PRILOG UZ RAČUN", f.getBrojFakture());
 
         Paragraph prilog = new Paragraph("PRILOG UZ FISKALNI RAČUN", new Font(BF_BOLD, 11, Font.NORMAL, PLAVA));
@@ -207,6 +213,29 @@ public class FinansijskiPdfGenerator {
 
         dodajPotpisi(doc);
         dodajFooter(doc);
+
+        if (usluge != null && !usluge.isEmpty()) {
+            doc.newPage();
+            dodajHeader(doc, firma, "IZVRŠENE USLUGE", f.getBrojFakture());
+
+            PdfPTable uslTable = new PdfPTable(new float[]{8, 92});
+            uslTable.setWidthPercentage(100);
+            uslTable.setSpacingAfter(7);
+            uslTable.addCell(kreirajTH("#"));
+            uslTable.addCell(kreirajTH("Opis usluge"));
+            for (int i = 0; i < usluge.size(); i++) {
+                BaseColor boja = (i % 2 == 0) ? BaseColor.WHITE : SVETLO_SIVA;
+                PdfPCell cBr = new PdfPCell(new Phrase((i + 1) + ".", FONT_TD));
+                cBr.setPadding(4); cBr.setBorderColor(BORDER_SIVA); cBr.setBorderWidth(0.5f);
+                cBr.setBackgroundColor(boja); cBr.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                PdfPCell cOp = new PdfPCell(new Phrase(usluge.get(i), FONT_TD));
+                cOp.setPadding(4); cOp.setBorderColor(BORDER_SIVA); cOp.setBorderWidth(0.5f);
+                cOp.setBackgroundColor(boja);
+                uslTable.addCell(cBr);
+                uslTable.addCell(cOp);
+            }
+            doc.add(uslTable);
+        }
     }
 
     // ── ZAJEDNICKI BLOKOVI ────────────────────────────────────────

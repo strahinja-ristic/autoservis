@@ -16,7 +16,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.logging.Logger;
 
 public class FakturaListaController {
@@ -112,12 +111,7 @@ public class FakturaListaController {
         colBroj.setPrefWidth(110);
 
         TableColumn<Faktura, String> colKlijent = new TableColumn<>("Klijent");
-        colKlijent.setCellValueFactory(c -> {
-            try {
-                Klijent k = klijentDao.vratiPoId(c.getValue().getKlijentId());
-                return new SimpleStringProperty(k != null ? k.getPunoIme() : "—");
-            } catch (SQLException e) { return new SimpleStringProperty("—"); }
-        });
+        colKlijent.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getKlijentIme()));
 
         TableColumn<Faktura, String> colDatum = new TableColumn<>("Datum");
         colDatum.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getDatumKreiranja()));
@@ -145,12 +139,7 @@ public class FakturaListaController {
         });
 
         TableColumn<Faktura, String> colIznos = new TableColumn<>("Iznos");
-        colIznos.setCellValueFactory(c -> {
-            try {
-                Faktura f = fakturaDao.vratiPoId(c.getValue().getId());
-                return new SimpleStringProperty(f != null ? fmtCena(f.zaUplatu()) : "—");
-            } catch (SQLException e) { return new SimpleStringProperty("—"); }
-        });
+        colIznos.setCellValueFactory(c -> new SimpleStringProperty(fmtCena(c.getValue().getIznosZaUplatu())));
         colIznos.setPrefWidth(110);
 
         TableColumn<Faktura, Void> colAkcije = new TableColumn<>("Akcije");

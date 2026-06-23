@@ -137,7 +137,7 @@ public class UlazRobePdfGenerator {
             tabela.addCell(kreirajTD(String.valueOf(i + 1), boja, Element.ALIGN_CENTER));
             tabela.addCell(kreirajTD(s.getNazivArtikla(), boja, Element.ALIGN_LEFT));
             tabela.addCell(kreirajTD(fmtKol(s.getKolicina()), boja, Element.ALIGN_RIGHT));
-            tabela.addCell(kreirajTD("", boja, Element.ALIGN_LEFT));
+            tabela.addCell(kreirajTD(s.getJedinicaMere() != null ? s.getJedinicaMere() : "", boja, Element.ALIGN_LEFT));
         }
 
         doc.add(tabela);

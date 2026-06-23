@@ -32,6 +32,6 @@ public class NalogArtikal {
 
     @Override
     public String toString() {
-        return nazivArtikla + " - " + kolicina + " " + jedinicaMere;
+        return nazivArtikla + " - " + kolicina + (jedinicaMere != null ? " " + jedinicaMere : "");
     }
 }

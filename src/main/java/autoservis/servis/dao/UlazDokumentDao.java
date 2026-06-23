@@ -78,7 +78,7 @@ public class UlazDokumentDao {
     public List<UlazMagacin> vratiStavke(int dokId) throws SQLException {
         List<UlazMagacin> lista = new ArrayList<>();
         String sql = """
-                SELECT s.*, a.naziv AS naziv_artikla
+                SELECT s.*, a.naziv AS naziv_artikla, a.jedinica_mere
                 FROM ulaz_magacin s
                 JOIN artikli a ON s.artikal_id = a.id
                 WHERE s.dokument_id = ?
@@ -92,6 +92,7 @@ public class UlazDokumentDao {
                     s.setId(rs.getInt("id"));
                     s.setArtikalId(rs.getInt("artikal_id"));
                     s.setNazivArtikla(rs.getString("naziv_artikla"));
+                    s.setJedinicaMere(rs.getString("jedinica_mere"));
                     s.setKolicina(rs.getDouble("kolicina"));
                     s.setDatum(rs.getString("datum"));
                     s.setNapomena(rs.getString("napomena"));

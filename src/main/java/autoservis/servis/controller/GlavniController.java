@@ -292,12 +292,17 @@ public class GlavniController {
             KlijentDao klijentDao2 = new KlijentDao();
             VoziloDao voziloDao2 = new VoziloDao();
 
+            java.util.Map<Integer, Klijent> klijentiMap = new java.util.HashMap<>();
+            for (Klijent kl : klijentDao2.vratiSve()) klijentiMap.put(kl.getId(), kl);
+            java.util.Map<Integer, Vozilo> vozilaMap = new java.util.HashMap<>();
+            for (Vozilo vl : voziloDao2.pretrazi("")) vozilaMap.put(vl.getId(), vl);
+
             List<RadniNalog> svi = nalogDao.vratiSve();
             for (RadniNalog rn : svi) {
                 if ("Završeno".equals(rn.getStatus())) continue;
 
-                Klijent k = klijentDao2.vratiPoId(rn.getKlijentId());
-                Vozilo v = voziloDao2.vratiPoId(rn.getVoziloId());
+                Klijent k = klijentiMap.get(rn.getKlijentId());
+                Vozilo v = vozilaMap.get(rn.getVoziloId());
 
                 VBox kartica = new VBox(6);
                 kartica.setPrefWidth(230);
@@ -393,27 +398,27 @@ public class GlavniController {
         colBroj.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getBrojNaloga()));
         colBroj.setPrefWidth(90);
 
+        java.util.Map<Integer, String> klijentImeCache;
+        java.util.Map<Integer, String> voziloStrCache;
+        try {
+            klijentImeCache = new KlijentDao().vratiSve().stream()
+                    .collect(java.util.stream.Collectors.toMap(Klijent::getId, Klijent::getPunoIme));
+            voziloStrCache = new VoziloDao().pretrazi("").stream()
+                    .collect(java.util.stream.Collectors.toMap(Vozilo::getId, Vozilo::toString));
+        } catch (Exception e) {
+            klijentImeCache = new java.util.HashMap<>();
+            voziloStrCache = new java.util.HashMap<>();
+        }
+        final java.util.Map<Integer, String> klijentImeFinal = klijentImeCache;
+        final java.util.Map<Integer, String> voziloStrFinal = voziloStrCache;
+
         TableColumn<RadniNalog, String> colKlijent = new TableColumn<>("Klijent");
-        colKlijent.setCellValueFactory(c -> {
-            try {
-                KlijentDao klijentDao = new KlijentDao();
-                Klijent k = klijentDao.vratiPoId(c.getValue().getKlijentId());
-                return new javafx.beans.property.SimpleStringProperty(k != null ? k.getPunoIme() : "");
-            } catch (Exception e) {
-                return new javafx.beans.property.SimpleStringProperty("");
-            }
-        });
+        colKlijent.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(
+                klijentImeFinal.getOrDefault(c.getValue().getKlijentId(), "")));
 
         TableColumn<RadniNalog, String> colVozilo = new TableColumn<>("Vozilo");
-        colVozilo.setCellValueFactory(c -> {
-            try {
-                VoziloDao voziloDao = new VoziloDao();
-                Vozilo v = voziloDao.vratiPoId(c.getValue().getVoziloId());
-                return new javafx.beans.property.SimpleStringProperty(v != null ? v.toString() : "");
-            } catch (Exception e) {
-                return new javafx.beans.property.SimpleStringProperty("");
-            }
-        });
+        colVozilo.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(
+                voziloStrFinal.getOrDefault(c.getValue().getVoziloId(), "")));
 
         TableColumn<RadniNalog, String> colSledeciKm = new TableColumn<>("Sledeći servis km");
         colSledeciKm.setCellValueFactory(c -> {
@@ -514,13 +519,8 @@ public class GlavniController {
         colPrBroj.setPrefWidth(100);
 
         TableColumn<Predracun, String> colPrKlijent = new TableColumn<>("Klijent");
-        colPrKlijent.setCellValueFactory(c -> {
-            try {
-                KlijentDao kd = new KlijentDao();
-                Klijent k = kd.vratiPoId(c.getValue().getKlijentId());
-                return new javafx.beans.property.SimpleStringProperty(k != null ? k.getPunoIme() : "");
-            } catch (Exception e) { return new javafx.beans.property.SimpleStringProperty(""); }
-        });
+        colPrKlijent.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(
+                klijentImeFinal.getOrDefault(c.getValue().getKlijentId(), "")));
 
         TableColumn<Predracun, String> colPrVazenje = new TableColumn<>("Važi do");
         colPrVazenje.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(

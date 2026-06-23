@@ -1,6 +1,7 @@
 package autoservis.servis.util;
 
 import autoservis.servis.dao.FakturaDao;
+import autoservis.servis.dao.RadniNalogDao;
 import autoservis.servis.model.*;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
@@ -56,7 +57,8 @@ public class FakturaPdfPreviewController {
         try {
             privremeniPdf = System.getProperty("java.io.tmpdir") +
                     "/preview_fakt_" + faktura.getBrojFakture().replace("-", "_") + ".pdf";
-            FinansijskiPdfGenerator.generisiFakturuNaPutanju(faktura, klijent, vozilo, firma, privremeniPdf);
+            java.util.List<String> usluge = ucitajUslugeIzNaloga();
+            FinansijskiPdfGenerator.generisiFakturuNaPutanju(faktura, klijent, vozilo, firma, usluge, privremeniPdf);
             ucitajStranice();
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -140,6 +142,21 @@ public class FakturaPdfPreviewController {
         stage.setScene(scene);
         stage.setMaximized(false);
         stage.showAndWait();
+    }
+
+    private java.util.List<String> ucitajUslugeIzNaloga() {
+        if (faktura.getRadniNalogId() == null) return java.util.Collections.emptyList();
+        try {
+            RadniNalog nalog = new RadniNalogDao().vratiPoId(faktura.getRadniNalogId());
+            if (nalog == null || nalog.getUsluge() == null || nalog.getUsluge().isEmpty())
+                return java.util.Collections.emptyList();
+            return nalog.getUsluge().stream()
+                    .map(NalogUsluga::getNaziv)
+                    .collect(java.util.stream.Collectors.toList());
+        } catch (Exception e) {
+            logger.warning("Greška pri učitavanju usluga iz naloga: " + e.getMessage());
+            return java.util.Collections.emptyList();
+        }
     }
 
     private void ucitajStranice() throws Exception {

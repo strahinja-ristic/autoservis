@@ -26,7 +26,9 @@ public class DatabaseManager {
     public static synchronized Connection getConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {
             connection = DriverManager.getConnection(DB_URL);
-            connection.createStatement().execute("PRAGMA foreign_keys = ON");
+            try (Statement _pragma = connection.createStatement()) {
+                _pragma.execute("PRAGMA foreign_keys = ON");
+            }
         }
         return connection;
     }
@@ -389,8 +391,9 @@ public class DatabaseManager {
         try (java.sql.PreparedStatement ps = getConnection()
                 .prepareStatement("SELECT value FROM settings WHERE key = ?")) {
             ps.setString(1, key);
-            java.sql.ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getString(1);
+            try (java.sql.ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getString(1);
+            }
         } catch (SQLException e) {
             logger.warning("getSetting failed for key=" + key + ": " + e.getMessage());
         }
@@ -410,7 +413,9 @@ public class DatabaseManager {
     }
 
     private static void exec(String sql) throws SQLException {
-        getConnection().createStatement().execute(sql);
+        try (Statement st = getConnection().createStatement()) {
+            st.execute(sql);
+        }
     }
 
     public static void backupNaDrajv(String driverPutanja) {

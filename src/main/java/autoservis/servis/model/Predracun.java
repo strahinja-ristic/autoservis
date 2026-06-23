@@ -22,7 +22,16 @@ public class Predracun {
 
     private List<PredracunStavka> stavke = new ArrayList<>();
 
+    private String klijentIme = "";
+    private double iznosZaUplatu = 0;
+
     public Predracun() {}
+
+    public String getKlijentIme() { return klijentIme; }
+    public void setKlijentIme(String klijentIme) { this.klijentIme = klijentIme != null ? klijentIme : ""; }
+
+    public double getIznosZaUplatu() { return iznosZaUplatu; }
+    public void setIznosZaUplatu(double iznosZaUplatu) { this.iznosZaUplatu = iznosZaUplatu; }
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }

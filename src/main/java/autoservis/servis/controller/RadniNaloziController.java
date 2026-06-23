@@ -106,24 +106,10 @@ public class RadniNaloziController {
         colBroj.setPrefWidth(100);
 
         TableColumn<RadniNalog, String> colKlijent = new TableColumn<>("Klijent");
-        colKlijent.setCellValueFactory(c -> {
-            try {
-                Klijent k = klijentDao.vratiPoId(c.getValue().getKlijentId());
-                return new SimpleStringProperty(k != null ? k.getPunoIme() : "");
-            } catch (SQLException e) {
-                return new SimpleStringProperty("");
-            }
-        });
+        colKlijent.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getKlijentIme()));
 
         TableColumn<RadniNalog, String> colVozilo = new TableColumn<>("Vozilo");
-        colVozilo.setCellValueFactory(c -> {
-            try {
-                Vozilo v = voziloDao.vratiPoId(c.getValue().getVoziloId());
-                return new SimpleStringProperty(v != null ? v.toString() : "");
-            } catch (SQLException e) {
-                return new SimpleStringProperty("");
-            }
-        });
+        colVozilo.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getVoziloStr()));
 
         TableColumn<RadniNalog, String> colDatum = new TableColumn<>("Datum prijema");
         colDatum.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getDatumPrijema()));

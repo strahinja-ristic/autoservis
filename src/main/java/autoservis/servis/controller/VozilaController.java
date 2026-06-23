@@ -4,6 +4,9 @@ import autoservis.servis.dao.KlijentDao;
 import autoservis.servis.dao.VoziloDao;
 import autoservis.servis.model.Klijent;
 import autoservis.servis.model.Vozilo;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,6 +26,7 @@ public class VozilaController {
     private ObservableList<Vozilo> vozila;
     private TextField searchField;
     private boolean prikazujeArhivu = false;
+    private Map<Integer, String> klijentImeMap = new HashMap<>();
 
     public VozilaController() {
         this.voziloDao = new VoziloDao();
@@ -77,14 +81,8 @@ public class VozilaController {
         tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         TableColumn<Vozilo, String> colKlijent = new TableColumn<>("Klijent");
-        colKlijent.setCellValueFactory(c -> {
-            try {
-                Klijent k = klijentDao.vratiPoId(c.getValue().getKlijentId());
-                return new SimpleStringProperty(k != null ? k.getPunoIme() : "");
-            } catch (SQLException e) {
-                return new SimpleStringProperty("");
-            }
-        });
+        colKlijent.setCellValueFactory(c ->
+                new SimpleStringProperty(klijentImeMap.getOrDefault(c.getValue().getKlijentId(), "")));
 
         TableColumn<Vozilo, String> colMarka = new TableColumn<>("Marka");
         colMarka.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getMarka()));
@@ -107,7 +105,7 @@ public class VozilaController {
         colKm.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getKilometraza() + " km"));
         colKm.setPrefWidth(100);
 
-        TableColumn<Vozilo, String> colUredjaj = new TableColumn<>("Uređaj");
+        TableColumn<Vozilo, String> colUredjaj = new TableColumn<>("Napomena");
         colUredjaj.setCellValueFactory(c -> new SimpleStringProperty(
                 c.getValue().getNapomena() != null ? c.getValue().getNapomena() : ""));
         colUredjaj.setPrefWidth(120);
@@ -154,7 +152,17 @@ public class VozilaController {
         view.setCenter(content);
     }
 
+    private void ucitajKlijentImeMap() {
+        try {
+            klijentImeMap = klijentDao.vratiSve().stream()
+                    .collect(Collectors.toMap(Klijent::getId, Klijent::getPunoIme));
+        } catch (SQLException e) {
+            klijentImeMap = new HashMap<>();
+        }
+    }
+
     private void ucitajVozila() {
+        ucitajKlijentImeMap();
         try {
             List<Vozilo> lista = voziloDao.pretrazi("");
             vozila.setAll(lista);
@@ -164,6 +172,7 @@ public class VozilaController {
     }
 
     private void pretrazi(String upit) {
+        ucitajKlijentImeMap();
         try {
             if (upit == null || upit.isBlank()) {
                 vozila.setAll(voziloDao.pretrazi(""));
@@ -199,6 +208,7 @@ public class VozilaController {
     }
 
     private void ucitajArhivirane() {
+        ucitajKlijentImeMap();
         try {
             vozila.setAll(voziloDao.vratiArhivirane());
         } catch (SQLException e) {

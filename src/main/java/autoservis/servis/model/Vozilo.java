@@ -48,6 +48,9 @@ public class Vozilo {
 
     @Override
     public String toString() {
-        return marka + " " + model + " (" + registracija + ")";
+        String m = marka != null ? marka : "";
+        String mo = model != null ? model : "";
+        String reg = registracija != null && !registracija.isBlank() ? " (" + registracija + ")" : "";
+        return (m + " " + mo).trim() + reg;
     }
 }

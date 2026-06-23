@@ -333,42 +333,40 @@ public class RadniNalogFormaController {
     }
 
     private void ucitajKlijente() {
+        acKlijent = new AutoCompleteField<>(List.of(), Klijent::getPunoIme);
+        acKlijent.setPromptText("Pretraži klijenta...");
+        acKlijent.setOnOdabrano(k -> ucitajVozila(k.getId()));
         try {
-            List<Klijent> lista = klijentDao.vratiSve();
-            acKlijent = new AutoCompleteField<>(lista, Klijent::getPunoIme);
-            acKlijent.setPromptText("Pretraži klijenta...");
-            acKlijent.setOnOdabrano(k -> ucitajVozila(k.getId()));
+            acKlijent.setElementi(klijentDao.vratiSve());
         } catch (SQLException e) {
             prikaziGresku("Greška pri učitavanju klijenata.");
         }
     }
 
     private void ucitajVozila(int klijentId) {
+        if (acVozilo == null) {
+            acVozilo = new AutoCompleteField<>(List.of(), Vozilo::toString);
+            acVozilo.setFilterFunkcija(v -> v.getMarka() + " " + v.getModel() + " " +
+                    (v.getRegistracija() != null ? v.getRegistracija() : "") + " " +
+                    (v.getBrojSasije() != null ? v.getBrojSasije() : ""));
+            acVozilo.setPromptText("Pretraži vozilo...");
+            acVozilo.setOnOdabrano(v -> {
+                if (nalog == null) {
+                    tfKilometraza.setText(String.valueOf(v.getKilometraza()));
+                }
+                ucitajIstorijaVozila(v);
+                try {
+                    Klijent k = klijentDao.vratiPoId(v.getKlijentId());
+                    if (k != null) acKlijent.postavi(k);
+                } catch (SQLException ignored) {}
+            });
+        }
         try {
             List<Vozilo> lista = klijentId == 0
                     ? voziloDao.pretrazi("")
                     : voziloDao.vratiPoKlijentu(klijentId);
-
-            if (acVozilo == null) {
-                acVozilo = new AutoCompleteField<>(lista, Vozilo::toString);
-                acVozilo.setFilterFunkcija(v -> v.getMarka() + " " + v.getModel() + " " +
-                        (v.getRegistracija() != null ? v.getRegistracija() : "") + " " +
-                        (v.getBrojSasije() != null ? v.getBrojSasije() : ""));
-                acVozilo.setPromptText("Pretraži vozilo...");
-                acVozilo.setOnOdabrano(v -> {
-                    if (nalog == null) {
-                        tfKilometraza.setText(String.valueOf(v.getKilometraza()));
-                    }
-                    ucitajIstorijaVozila(v);
-                    try {
-                        Klijent k = klijentDao.vratiPoId(v.getKlijentId());
-                        if (k != null) acKlijent.postavi(k);
-                    } catch (SQLException ignored) {}
-                });
-            } else {
-                acVozilo.setElementi(lista);
-                acVozilo.setPromptText(lista.isEmpty() ? "Klijent nema vozila" : "Pretraži vozilo...");
-            }
+            acVozilo.setElementi(lista);
+            acVozilo.setPromptText(lista.isEmpty() ? "Klijent nema vozila" : "Pretraži vozilo...");
         } catch (SQLException e) {
             prikaziGresku("Greška pri učitavanju vozila.");
         }

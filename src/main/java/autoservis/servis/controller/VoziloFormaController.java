@@ -84,7 +84,7 @@ public class VoziloFormaController {
                 kreirajRed("Registracija", tfRegistracija),
                 kreirajRed("Broj šasije", tfBrojSasije),
                 kreirajRed("Kilometraža", tfKilometraza),
-                kreirajRedNode("Uređaj", taNapomena)
+                kreirajRedNode("Napomena", taNapomena)
         );
 
         Button btnSacuvaj = new Button("Sačuvaj");
@@ -128,8 +128,8 @@ public class VoziloFormaController {
         } catch (SQLException e) {
             prikaziGresku("Greška pri učitavanju klijenta: " + e.getMessage());
         }
-        tfMarka.setText(vozilo.getMarka());
-        tfModel.setText(vozilo.getModel());
+        tfMarka.setText(vozilo.getMarka() != null ? vozilo.getMarka() : "");
+        tfModel.setText(vozilo.getModel() != null ? vozilo.getModel() : "");
         tfGodiste.setText(vozilo.getGodiste() != null ? String.valueOf(vozilo.getGodiste()) : "");
         tfRegistracija.setText(vozilo.getRegistracija() != null ? vozilo.getRegistracija() : "");
         tfBrojSasije.setText(vozilo.getBrojSasije() != null ? vozilo.getBrojSasije() : "");

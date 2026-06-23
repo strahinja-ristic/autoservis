@@ -160,10 +160,13 @@ public class StatistikeController {
             Map<Integer, Long> poKlijentima = sviNalozi.stream()
                     .collect(Collectors.groupingBy(RadniNalog::getKlijentId, Collectors.counting()));
 
+            Map<Integer, String> klijentImeMap = klijentDao.vratiSve().stream()
+                    .collect(Collectors.toMap(Klijent::getId, Klijent::getPunoIme));
+
             List<Map.Entry<String, Long>> sortirana = new ArrayList<>();
             for (Map.Entry<Integer, Long> entry : poKlijentima.entrySet()) {
-                Klijent k = klijentDao.vratiPoId(entry.getKey());
-                if (k != null) sortirana.add(Map.entry(k.getPunoIme(), entry.getValue()));
+                String ime = klijentImeMap.get(entry.getKey());
+                if (ime != null) sortirana.add(Map.entry(ime, entry.getValue()));
             }
             sortirana.sort((a, b) -> Long.compare(b.getValue(), a.getValue()));
             tabelaKlijenti.setItems(FXCollections.observableArrayList(
@@ -193,13 +196,8 @@ public class StatistikeController {
 
         try {
             Map<String, Double> artikalMap = new HashMap<>();
-            for (RadniNalog rn : sviNalozi) {
-                RadniNalog pun = nalogDao.vratiPoId(rn.getId());
-                if (pun != null) {
-                    for (NalogArtikal na : pun.getArtikli()) {
-                        artikalMap.merge(na.getNazivArtikla(), na.getKolicina(), Double::sum);
-                    }
-                }
+            for (NalogArtikal na : nalogDao.vratiSveArtikle()) {
+                artikalMap.merge(na.getNazivArtikla(), na.getKolicina(), Double::sum);
             }
             List<Map.Entry<String, Double>> sortirani = new ArrayList<>(artikalMap.entrySet());
             sortirani.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));

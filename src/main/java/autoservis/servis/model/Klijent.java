@@ -57,9 +57,11 @@ public class Klijent {
     // Pomocna metoda - vraca puno ime za prikaz u listi
     public String getPunoIme() {
         if ("Pravno".equals(tip)) {
-            return nazivFirme;
+            return nazivFirme != null ? nazivFirme : "";
         }
-        return ime + " " + prezime;
+        String i = ime != null ? ime : "";
+        String p = (prezime != null && !prezime.isBlank()) ? prezime : "";
+        return p.isEmpty() ? i : i + " " + p;
     }
 
     @Override
